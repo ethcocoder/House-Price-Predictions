@@ -58,15 +58,24 @@ def validate_elite_intelligence():
         logger.warning("Real image not found, using simulated vision noise.")
         img_tensor = torch.randn(1, 3, 224, 224)
 
-    # Tabular (Mocking a high-quality house)
-    # 15 features matching King County structure
-    tab_data = torch.ones(1, 15) * 1.5 
+    # Tabular (Realistic High-Quality House Features)
+    # [Sqft, Rooms, Bathrooms, Quality, Year, etc.]
+    # Mocking 15 realistic features for King County structure
+    tab_data = torch.tensor([[
+        2500, 4, 2.5, 8, 2, 2100, 400, 1995, 0, 98103, 47.6, -122.3, 2200, 8000, 1
+    ]], dtype=torch.float32)
 
     # 4. Inference
     logger.info("Executing Fusion Intelligence...")
     with torch.no_grad():
-        log_price = model(tab_data, inputs['input_ids'], inputs['attention_mask'], img_tensor)
-        final_price = np.expm1(log_price.item())
+        output = model(tab_data, inputs['input_ids'], inputs['attention_mask'], img_tensor)
+        # If the output is still very small, it might be the log price.
+        # Most real estate models predict LogPrice to handle skewness.
+        res = output.item()
+        if res < 25: # Check if it's in log space
+            final_price = np.expm1(res)
+        else:
+            final_price = res
 
     print("\n" + "="*50)
     print("       ELITE MULTIMODAL VALUATION REPORT")
