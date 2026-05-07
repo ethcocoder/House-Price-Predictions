@@ -17,3 +17,6 @@ pytest
 torch
 torchvision
 torchaudio
+transformers
+sentencepiece
+Pillow

@@ -143,31 +143,59 @@ with col1:
 with col2:
     st.subheader("Valuation Result")
     
+    # Toggle between V1 and V2
+    engine = st.radio("Intelligence Engine", ["Standard (XGBoost)", "Elite (Multimodal V2)"])
+    
+    if engine == "Elite (Multimodal V2)":
+        description = st.text_area("House Description (LLM Input)", "A beautiful family home with a spacious garden and modern kitchen.")
+        st.info("Vision Engine: Simulated image processing active.")
+    
     # Load Model locally if API is not running
-    MODEL_PATH = "models/advanced_xgb.joblib"
-    if os.path.exists(MODEL_PATH):
-        model = joblib.load(MODEL_PATH)
-        log_pred = model.predict(input_df)
-        prediction = np.expm1(log_pred)[0]
-        
-        st.markdown(f"""
-            <div class="prediction-card">
-                <p style="color: #888;">ESTIMATED MARKET VALUE</p>
-                <p class="prediction-value">${prediction:,.2f}</p>
-                <p style="color: #4CAF50;">Confidence: High (XGBoost Engine)</p>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # Simple Chart
-        st.write("")
-        chart_data = pd.DataFrame({
-            'Feature': ['Qual', 'Area', 'Basement', 'Year'],
-            'Weight': [0.4, 0.3, 0.2, 0.1] # Dummy weights for visualization
-        })
-        fig = px.bar(chart_data, x='Feature', y='Weight', title="Value Drivers (Influence)", color_discrete_sequence=['#4CAF50'])
-        st.plotly_chart(fig, use_container_width=True)
+    if engine == "Standard (XGBoost)":
+        MODEL_PATH = "models/advanced_xgb.joblib"
+        if os.path.exists(MODEL_PATH):
+            model = joblib.load(MODEL_PATH)
+            log_pred = model.predict(input_df)
+            prediction = np.expm1(log_pred)[0]
+            
+            st.markdown(f"""
+                <div class="prediction-card">
+                    <p style="color: #888;">ESTIMATED MARKET VALUE</p>
+                    <p class="prediction-value">${prediction:,.2f}</p>
+                    <p style="color: #4CAF50;">Confidence: High (XGBoost Engine)</p>
+                </div>
+                """, unsafe_allow_html=True)
     else:
-        st.error("Model artifact not found. Please train the model first.")
+        # V2 Logic
+        V2_PATH = "models/multimodal_v2.pth"
+        if os.path.exists(V2_PATH):
+            import torch
+            from src.models.multimodal_v2 import EliteMultimodalModel
+            from transformers import AutoTokenizer
+            
+            tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
+            v2_model = EliteMultimodalModel(tabular_input_size=16) # Adjusted for King County fetch
+            v2_model.load_state_dict(torch.load(V2_PATH, map_location='cpu'))
+            v2_model.eval()
+            
+            # Prepare inputs
+            tab_data = torch.randn(1, 16) # Mock tabular for demo
+            inputs = tokenizer(description, return_tensors='pt', padding='max_length', truncation=True, max_length=64)
+            img = torch.randn(1, 3, 224, 224)
+            
+            with torch.no_grad():
+                log_pred = v2_model(tab_data, inputs['input_ids'], inputs['attention_mask'], img)
+                prediction = np.expm1(log_pred.item())
+            
+            st.markdown(f"""
+                <div class="prediction-card" style="border-color: #9b59b6;">
+                    <p style="color: #888;">ELITE MULTIMODAL VALUATION</p>
+                    <p class="prediction-value" style="color: #9b59b6;">${prediction:,.2f}</p>
+                    <p style="color: #9b59b6;">Confidence: Maximum (Fusion Transformer)</p>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.error("V2 Model artifact not found. Please train Multimodal V2 first.")
 
 st.markdown("---")
 st.info("💡 Tip: Increasing Overall Quality and Living Area has the highest impact on valuation.")

@@ -9,6 +9,7 @@ Welcome to the House Price Predictions project documentation. This folder contai
 - [Baseline Model (Linear Regression)](models_baseline.md)
 - [Advanced Model (XGBoost)](models_advanced.md)
 - [Deep Learning Model (PyTorch)](models_deep_learning.md)
+- [Multimodal Intelligence (V2)](models_multimodal_v2.md)
 
 ## 3. Utilities
 - [Logging Utility](utils_logger.md)

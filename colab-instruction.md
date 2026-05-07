@@ -19,7 +19,7 @@ drive.mount('/content/drive')
 You can either clone your repository or upload the project files.
 ```bash
 # Example if using git
-!git clone https://github.com/ethcocoder/House-Price-Predictions.git
+!git clone -b version-2 https://github.com/ethcocoder/House-Price-Predictions.git
 %cd House-Price-Predictions
 ```
 
@@ -61,6 +61,16 @@ XGBoost will automatically use all available cores.
 This script includes automatic CUDA detection and model saving.
 ```python
 !python -m src.models.deep_learning
+```
+
+### D. Train Multimodal V2 (LLM + Vision + Tabular)
+*Note: We recommend saving backbones locally for faster reuse.*
+```python
+# 1. Download and save BERT/ResNet backbones to models/backbones/
+!python -m src.utils.save_backbones
+
+# 2. Train the fusion model
+!python -m src.models.multimodal_v2
 ```
 
 ## 5. Production Optimization for Colab

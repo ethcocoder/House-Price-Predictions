@@ -237,6 +237,25 @@ Build a production-grade machine learning system capable of predicting house pri
 
 ---
 
+# Phase 11 — Multimodal Intelligence (V2)
+
+## Objectives
+- Evolve from structured data to multimodal intelligence (Tabular + Text + Vision).
+- Enhance valuation accuracy by analyzing unstructured real estate descriptions and property images.
+
+## Multimodal Architecture
+- **Text (Light LLM)**: Process property descriptions, agent notes, and neighborhood reviews using a BERT-based or DistilBERT encoder.
+- **Vision (CNN/ViT)**: Analyze property photos (Exterior, Interior, Kitchen) to estimate "Visual Quality" scores.
+- **Fusion Layer**: Concatenate Tabular, Text, and Vision embeddings into a unified Transformer for final price estimation.
+
+## Deliverables
+- Multimodal training pipeline.
+- Visual condition assessment module.
+- LLM-powered property description analyzer.
+- V2 "Elite" inference engine.
+
+---
+
 # Suggested Repository Structure
 
 ```text

@@ -61,6 +61,23 @@ def augment_dataset(df: pd.DataFrame, target_rows: int = 100000):
             if df_augmented[col].min() >= 0:
                  df_augmented[col] = df_augmented[col].clip(lower=0)
 
+    # 3. Add Simulated V2 Multimodal Data
+    logger.info("Adding simulated Multimodal data (Text & Vision paths)...")
+    
+    # Simulated house descriptions
+    descriptions = [
+        "Beautiful family home with a spacious garden and modern kitchen.",
+        "Cozy cottage in a quiet neighborhood, perfect for first-time buyers.",
+        "Luxurious estate featuring high-end finishes and a private pool.",
+        "Modern urban apartment with stunning city views and balcony.",
+        "Renovated farmhouse with rustic charm and large lot size.",
+        "Classic suburban house with a large garage and finished basement."
+    ]
+    df_augmented['description'] = np.random.choice(descriptions, size=len(df_augmented))
+    
+    # Simulated image paths (placeholders)
+    df_augmented['image_path'] = [f"data/images/house_{i}.jpg" for i in range(len(df_augmented))]
+
     # Trim to exact target rows
     df_augmented = df_augmented.iloc[:target_rows]
     logger.info(f"Augmentation complete. Final shape: {df_augmented.shape}")
