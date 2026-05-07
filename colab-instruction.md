@@ -34,9 +34,14 @@ print(f"Device: {torch.cuda.get_device_name(0)}")
 ```
 
 ## 3. Data Preparation
-If you haven't uploaded the data, run the acquisition script:
+For the original Ames dataset (2.9k rows):
 ```python
 !python -m src.preprocessing.cleaning
+```
+
+For the **Massive Dataset** (250k rows - Recommended for Deep Learning):
+```python
+!python -m src.utils.dataset
 ```
 
 ## 4. Execution Pipeline

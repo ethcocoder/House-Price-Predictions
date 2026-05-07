@@ -32,15 +32,20 @@ class HousingMLP(nn.Module):
     def __init__(self, input_size):
         super(HousingMLP, self).__init__()
         self.network = nn.Sequential(
-            nn.Linear(input_size, 128),
+            nn.Linear(input_size, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            
+            nn.Linear(256, 128),
+            nn.BatchNorm1d(128),
             nn.ReLU(),
             nn.Dropout(0.2),
+            
             nn.Linear(128, 64),
             nn.ReLU(),
-            nn.Dropout(0.1),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.Linear(32, 1)
+            
+            nn.Linear(64, 1)
         )
 
     def forward(self, x):
@@ -82,15 +87,19 @@ def train_nn():
     # Model, Loss, Optimizer
     model = HousingMLP(X_processed.shape[1]).to(device)
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.0005) # Lowered LR
+    # Added Weight Decay (L2 Regularization)
+    optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5) 
+    
+    # Learning Rate Scheduler
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10, verbose=True)
     
     # Training Loop
-    epochs = 200
+    epochs = 300
     best_loss = float('inf')
-    patience = 20
+    patience = 30 # Increased patience
     counter = 0
     
-    logger.info("Starting Neural Network training with Early Stopping...")
+    logger.info("Starting Optimized Neural Network training...")
     for epoch in range(epochs):
         model.train()
         train_loss = 0
@@ -118,8 +127,11 @@ def train_nn():
         avg_train_loss = train_loss / len(train_loader)
         avg_test_loss = test_loss / len(test_loader)
         
+        # Step the scheduler
+        scheduler.step(avg_test_loss)
+        
         if (epoch + 1) % 10 == 0:
-            logger.info(f"Epoch [{epoch+1}/{epochs}], Train Loss: {avg_train_loss:.4f}, Test Loss: {avg_test_loss:.4f}")
+            logger.info(f"Epoch [{epoch+1}/{epochs}], Train Loss: {avg_train_loss:.4f}, Test Loss: {avg_test_loss:.4f}, LR: {optimizer.param_groups[0]['lr']:.6f}")
         
         # Early Stopping & Best Model Saving
         if avg_test_loss < best_loss:
