@@ -43,7 +43,7 @@ def run_inference(model, tokenizer, image_path, description, tabular_data):
     return res, final_price
 
 def validate_elite_intelligence():
-    logger.info("--- Starting Multi-Scenario Multimodal Validation ---")
+    logger.info("--- Starting 4-Scenario Multimodal Stress Test ---")
     
     # Setup
     model_path = "models/multimodal_v2.pth"
@@ -58,37 +58,53 @@ def validate_elite_intelligence():
     local_tok = "models/backbones/distilbert_tokenizer"
     tokenizer = AutoTokenizer.from_pretrained(local_tok if os.path.exists(local_tok) else "distilbert-base-uncased")
 
+    # 4 Scenarios: 2 Images x 2 Prompts
     scenarios = [
+        # Scenario 1: Modern House + Luxury Prompt
         {
-            "name": "MODERN LUXURY ESTATE",
+            "name": "MODERN (Luxury Listing)",
             "image": "data/images/house_0.jpg",
-            "desc": "A magnificent modern estate featuring an open-concept design, chef's kitchen, and floor-to-ceiling windows.",
+            "desc": "An elite ultra-modern mansion with smart home tech and premium finishes.",
             "tab": torch.tensor([[2500, 4, 2.5, 9, 2, 2100, 400, 2015, 0, 98103, 47.6, -122.3, 2200, 8000, 1]], dtype=torch.float32)
         },
+        # Scenario 2: Modern House + Negative Prompt
         {
-            "name": "CLASSIC COZY COTTAGE",
+            "name": "MODERN (Foreclosure/Distressed)",
+            "image": "data/images/house_0.jpg",
+            "desc": "A modern building in significant disrepair, requires total renovation and structural work.",
+            "tab": torch.tensor([[2500, 4, 2.5, 9, 2, 2100, 400, 2015, 0, 98103, 47.6, -122.3, 2200, 8000, 1]], dtype=torch.float32)
+        },
+        # Scenario 3: Cottage + Charming Prompt
+        {
+            "name": "COTTAGE (Charming Boutique)",
             "image": "data/images/house_1.jpg",
-            "desc": "A charming rustic cottage with brick walls and a beautiful flower garden, perfect for a quiet lifestyle.",
+            "desc": "A world-class charming cottage with historical value and a prize-winning garden.",
+            "tab": torch.tensor([[1200, 2, 1.0, 6, 1, 1000, 200, 1950, 0, 98103, 47.5, -122.4, 1100, 4000, 0]], dtype=torch.float32)
+        },
+        # Scenario 4: Cottage + Negative Prompt
+        {
+            "name": "COTTAGE (Abandoned/Rotting)",
+            "image": "data/images/house_1.jpg",
+            "desc": "An old abandoned wooden shed with rotting walls and overgrown weeds.",
             "tab": torch.tensor([[1200, 2, 1.0, 6, 1, 1000, 200, 1950, 0, 98103, 47.5, -122.4, 1100, 4000, 0]], dtype=torch.float32)
         }
     ]
 
-    print("\n" + "═"*60)
-    print("       ELITE MULTIMODAL COMPARISON REPORT")
-    print("═"*60)
+    print("\n" + "═"*70)
+    print("       ELITE MULTIMODAL 4-SCENARIO STRESS TEST")
+    print("═"*70)
 
     for s in scenarios:
         raw, price = run_inference(model, tokenizer, s['image'], s['desc'], s['tab'])
         
-        print(f"SCENARIO:    {s['name']}")
-        print(f"DESCRIPTION: {s['desc'][:60]}...")
+        print(f"TEST:        {s['name']}")
         print(f"IMAGE:       {os.path.basename(s['image'])}")
-        print(f"RAW OUTPUT:  {raw:.4f}")
-        print(f"PREDICTION:  ${price:,.2f} USD")
-        print("-" * 60)
+        print(f"PROMPT:      {s['desc'][:60]}...")
+        print(f"RESULT:      ${price:,.2f} USD")
+        print("-" * 70)
 
-    print("STATUS:      Multi-Scenario Inference Successful")
-    print("═"*60 + "\n")
+    print("STATUS:      4-Scenario Stress Test Complete")
+    print("═"*70 + "\n")
 
 if __name__ == "__main__":
     validate_elite_intelligence()
