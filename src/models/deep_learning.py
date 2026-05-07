@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader, Dataset
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
+from sklearn.metrics import mean_squared_error, r2_score
 import os
 from src.utils.logger import setup_logger
 
@@ -81,13 +82,15 @@ def train_nn():
     # Model, Loss, Optimizer
     model = HousingMLP(X_processed.shape[1]).to(device)
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.0005) # Lowered LR
     
     # Training Loop
-    epochs = 100
+    epochs = 200
     best_loss = float('inf')
+    patience = 20
+    counter = 0
     
-    logger.info("Starting Neural Network training...")
+    logger.info("Starting Neural Network training with Early Stopping...")
     for epoch in range(epochs):
         model.train()
         train_loss = 0
@@ -118,10 +121,17 @@ def train_nn():
         if (epoch + 1) % 10 == 0:
             logger.info(f"Epoch [{epoch+1}/{epochs}], Train Loss: {avg_train_loss:.4f}, Test Loss: {avg_test_loss:.4f}")
         
-        # Save best model
+        # Early Stopping & Best Model Saving
         if avg_test_loss < best_loss:
             best_loss = avg_test_loss
             torch.save(model.state_dict(), "models/best_nn.pth")
+            counter = 0
+            logger.debug(f"New best model saved at epoch {epoch+1}")
+        else:
+            counter += 1
+            if counter >= patience:
+                logger.info(f"Early stopping triggered at epoch {epoch+1}")
+                break
     
     # Final Evaluation
     model.eval()
