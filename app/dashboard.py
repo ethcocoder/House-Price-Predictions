@@ -174,12 +174,12 @@ with col2:
             from transformers import AutoTokenizer
             
             tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
-            v2_model = EliteMultimodalModel(tabular_input_size=16) # Adjusted for King County fetch
+            v2_model = EliteMultimodalModel(tabular_input_size=15) # Adjusted for King County fetch
             v2_model.load_state_dict(torch.load(V2_PATH, map_location='cpu'))
             v2_model.eval()
             
             # Prepare inputs
-            tab_data = torch.randn(1, 16) # Mock tabular for demo
+            tab_data = torch.randn(1, 15) # Mock tabular for demo
             inputs = tokenizer(description, return_tensors='pt', padding='max_length', truncation=True, max_length=64)
             img = torch.randn(1, 3, 224, 224)
             

@@ -30,8 +30,8 @@ def validate_elite_intelligence():
 
     # 2. Load Model
     logger.info("Loading Elite Multimodal V2 Model...")
-    # tabular_input_size=16 based on King County fetch columns
-    model = EliteMultimodalModel(tabular_input_size=16)
+    # tabular_input_size=15 based on King County fetch columns (18 total - 3 multimodal/target)
+    model = EliteMultimodalModel(tabular_input_size=15)
     model.load_state_dict(torch.load(model_path, map_location='cpu'))
     model.eval()
 
@@ -59,8 +59,8 @@ def validate_elite_intelligence():
         img_tensor = torch.randn(1, 3, 224, 224)
 
     # Tabular (Mocking a high-quality house)
-    # 16 features matching King County structure
-    tab_data = torch.ones(1, 16) * 1.5 
+    # 15 features matching King County structure
+    tab_data = torch.ones(1, 15) * 1.5 
 
     # 4. Inference
     logger.info("Executing Fusion Intelligence...")
