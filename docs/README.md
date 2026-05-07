@@ -14,5 +14,8 @@ Welcome to the House Price Predictions project documentation. This folder contai
 - [Logging Utility](utils_logger.md)
 - [Massive Dataset Utility](utils_dataset.md)
 
-## 4. Execution Guides
+## 4. Quality Assurance
+- [Testing & QA](testing.md)
+
+## 5. Execution Guides
 - [Google Colab Training Instructions](../colab-instruction.md)
