@@ -69,8 +69,12 @@ def predict_price(features: dict):
         logger.error(f"Prediction error: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Error processing input: {str(e)}")
 
+class MultimodalV2Request(BaseModel):
+    features: dict
+    description: str
+
 @app.post("/predict/v2")
-def predict_v2(features: dict, description: str):
+def predict_v2(request: MultimodalV2Request):
     """
     Elite Multimodal V2 Prediction.
     Accepts tabular features and a house description.
@@ -84,11 +88,10 @@ def predict_v2(features: dict, description: str):
         
         # Prepare Tabular
         # Note: In production, you'd use the exact same scaler/preprocessor as training
-        # For this demo, we assume the dict is already processed or small
         tab_data = torch.randn(1, 16) # Mock tabular data for demo
         
         # Prepare Text
-        inputs = tokenizer(description, return_tensors='pt', padding='max_length', truncation=True, max_length=64)
+        inputs = tokenizer(request.description, return_tensors='pt', padding='max_length', truncation=True, max_length=64)
         
         # Prepare Vision (Mock image)
         img = torch.randn(1, 3, 224, 224)

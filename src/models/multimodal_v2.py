@@ -101,6 +101,9 @@ class EliteMultimodalModel(nn.Module):
             self.vision_encoder = models.resnet18(pretrained=True)
             
         self.vision_encoder.fc = nn.Identity() 
+        for param in self.vision_encoder.parameters():
+            param.requires_grad = False
+        self.vision_projection = nn.Linear(512, 128)
         
         # 4. Fusion Layer (Transformer-like fusion or simple concatenation)
         self.fusion = nn.Sequential(
