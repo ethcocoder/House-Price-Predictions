@@ -88,8 +88,9 @@ class EliteMultimodalModel(nn.Module):
         else:
             self.text_encoder = AutoModel.from_pretrained(text_model_name)
             
+        # Unfrozen for Elite Fine-Tuning (Learns aesthetic/textual nuances)
         for param in self.text_encoder.parameters():
-            param.requires_grad = False
+            param.requires_grad = True
         self.text_projection = nn.Linear(768, 128)
         
         # 3. Vision Encoder (ResNet18)
@@ -103,8 +104,9 @@ class EliteMultimodalModel(nn.Module):
             self.vision_encoder = models.resnet18(weights='DEFAULT')
             
         self.vision_encoder.fc = nn.Identity() 
+        # Unfrozen for Elite Fine-Tuning
         for param in self.vision_encoder.parameters():
-            param.requires_grad = False
+            param.requires_grad = True
         self.vision_projection = nn.Linear(512, 128)
         
         # 4. Fusion Layer (Deeper & More Powerful)
@@ -163,7 +165,8 @@ def train_v2():
     # Model
     model = EliteMultimodalModel(len(tabular_cols)).to(device)
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.0005)
+    # Elite Fine-Tuning Learning Rate (Very small to preserve pre-trained knowledge)
+    optimizer = optim.Adam(model.parameters(), lr=1e-5)
     
     logger.info("Starting Multimodal Training Loop...")
     model.train()
