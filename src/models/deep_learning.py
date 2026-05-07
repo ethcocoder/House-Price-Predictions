@@ -91,7 +91,7 @@ def train_nn():
     optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5) 
     
     # Learning Rate Scheduler
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10, verbose=True)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10)
     
     # Training Loop
     epochs = 300
