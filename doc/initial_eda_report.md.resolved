@@ -1,0 +1,39 @@
+# House Price Prediction - Initial EDA Report
+
+## 1. Project Structure Setup
+The project environment has been initialized with a production-grade directory structure:
+- `data/raw/`: Contains the Ames Housing dataset (`housing.csv`).
+- `src/`: Modular code for preprocessing, modeling, and utilities.
+- `notebooks/`: EDA scripts and generated visualizations.
+- `logs/`: Application and EDA logs.
+
+## 2. Dataset Overview
+- **Total Records**: 2930
+- **Total Features**: 82 (excluding index)
+- **Target Variable**: `SalePrice`
+
+## 3. Missing Values Analysis
+Significant missing data detected in several columns:
+- **Pool QC**: 99.56% (To be dropped)
+- **Misc Feature**: 96.38% (To be dropped)
+- **Alley**: 93.24% (To be dropped)
+- **Fence**: 80.48% (To be dropped)
+- **Mas Vnr Type**: 60.58%
+- **Fireplace Qu**: 48.53%
+- **Lot Frontage**: 16.72%
+
+## 4. Visualizations
+The following plots have been generated in the `notebooks/` directory:
+- `sale_price_distribution.png`: Shows the distribution of house prices (typically right-skewed).
+- `correlation_heatmap.png`: Displays the top 15 features correlated with `SalePrice`.
+
+## 5. Next Steps
+1. **Data Preprocessing**:
+   - Handle missing values (imputation or dropping).
+   - Encode categorical variables.
+   - Scale numerical features.
+2. **Feature Engineering**:
+   - Create new features like `TotalSF` (Total Square Footage).
+   - Handle outliers (e.g., Gr Liv Area vs SalePrice).
+3. **Model Baselining**:
+   - Train a simple Linear Regression model to establish a performance baseline.
