@@ -70,12 +70,14 @@ class EliteMultimodalModel(nn.Module):
     def __init__(self, tabular_input_size, text_model_name='distilbert-base-uncased'):
         super(EliteMultimodalModel, self).__init__()
         
-        # 1. Tabular Encoder
+        # 1. Tabular Encoder (Deeper)
         self.tabular_encoder = nn.Sequential(
-            nn.Linear(tabular_input_size, 128),
-            nn.BatchNorm1d(128),
+            nn.Linear(tabular_input_size, 256),
+            nn.BatchNorm1d(256),
             nn.ReLU(),
-            nn.Dropout(0.2)
+            nn.Dropout(0.2),
+            nn.Linear(256, 128),
+            nn.ReLU()
         )
         
         # 2. Text Encoder (DistilBERT)
@@ -105,11 +107,14 @@ class EliteMultimodalModel(nn.Module):
             param.requires_grad = False
         self.vision_projection = nn.Linear(512, 128)
         
-        # 4. Fusion Layer (Transformer-like fusion or simple concatenation)
+        # 4. Fusion Layer (Deeper & More Powerful)
         self.fusion = nn.Sequential(
-            nn.Linear(128 + 128 + 128, 256),
+            nn.Linear(128 + 128 + 128, 512),
+            nn.BatchNorm1d(512),
             nn.ReLU(),
-            nn.Dropout(0.2),
+            nn.Dropout(0.3),
+            nn.Linear(512, 256),
+            nn.ReLU(),
             nn.Linear(256, 128),
             nn.ReLU(),
             nn.Linear(128, 1)
@@ -162,7 +167,7 @@ def train_v2():
     
     logger.info("Starting Multimodal Training Loop...")
     model.train()
-    for epoch in range(5): # Small epochs for demo
+    for epoch in range(100): # Small epochs for demo
         epoch_loss = 0
         for batch in loader:
             tab = batch['tabular'].to(device)
@@ -179,7 +184,7 @@ def train_v2():
             
             epoch_loss += loss.item()
         
-        logger.info(f"Epoch {epoch+1}/5, Loss: {epoch_loss/len(loader):.4f}")
+        logger.info(f"Epoch {epoch+1}/100, Loss: {epoch_loss/len(loader):.4f}")
 
     if not os.path.exists("models"):
         os.makedirs("models")

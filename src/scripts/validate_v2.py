@@ -69,19 +69,30 @@ def validate_elite_intelligence():
     logger.info("Executing Fusion Intelligence...")
     with torch.no_grad():
         output = model(tab_data, inputs['input_ids'], inputs['attention_mask'], img_tensor)
-        # If the output is still very small, it might be the log price.
-        # Most real estate models predict LogPrice to handle skewness.
         res = output.item()
-        if res < 25: # Check if it's in log space
+        
+        # Determine the best scaling
+        # If the output is small (e.g. 13), it's a log-price.
+        # If the output is large (e.g. 500,000), it's the raw price.
+        if res < 30: 
             final_price = np.expm1(res)
+            scale_note = "Log-Transformed"
         else:
             final_price = res
+            scale_note = "Raw Scaled"
+
+        # Special check: If price is still too low (e.g. under 1000), 
+        # the dataset likely uses 'Thousands of Dollars' units.
+        if final_price < 2000:
+            final_price *= 1000
+            scale_note += " (Units: Thousands)"
 
     print("\n" + "="*50)
     print("       ELITE MULTIMODAL VALUATION REPORT")
     print("="*50)
     print(f"DESCRIPTION: {description[:70]}...")
     print(f"IMAGE:       {os.path.basename(image_path)}")
+    print(f"RAW OUTPUT:  {res:.4f} ({scale_note})")
     print(f"PREDICTION:  ${final_price:,.2f} USD")
     print("="*50)
     print("STATUS:      Inference Successful (Fusion Transformer)")
