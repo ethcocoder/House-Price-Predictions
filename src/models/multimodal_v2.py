@@ -91,14 +91,14 @@ class EliteMultimodalModel(nn.Module):
         self.text_projection = nn.Linear(768, 128)
         
         # 3. Vision Encoder (ResNet18)
-        self.vision_encoder = models.resnet18(pretrained=False) # Use false as we load manual weights
+        self.vision_encoder = models.resnet18(weights=None) # Use None as we load manual weights
         local_vision_path = "models/backbones/resnet18_weights.pth"
         if os.path.exists(local_vision_path):
             self.vision_encoder.load_state_dict(torch.load(local_vision_path, map_location='cpu'))
             logger.info("Loaded vision encoder from local cache.")
         else:
             # Fallback to online weights
-            self.vision_encoder = models.resnet18(pretrained=True)
+            self.vision_encoder = models.resnet18(weights='DEFAULT')
             
         self.vision_encoder.fc = nn.Identity() 
         for param in self.vision_encoder.parameters():

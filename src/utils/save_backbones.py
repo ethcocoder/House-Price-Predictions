@@ -27,7 +27,7 @@ def save_models():
     
     # 2. Save ResNet18 (Vision)
     logger.info("Downloading and saving ResNet18...")
-    vision_model = models.resnet18(pretrained=True)
+    vision_model = models.resnet18(weights='DEFAULT')
     torch.save(vision_model.state_dict(), f"{output_dir}/resnet18_weights.pth")
 
     logger.info(f"All backbones saved successfully to {output_dir}")
